@@ -27,6 +27,13 @@
 .App-link {
   color: #61dafb;
 }
+#disco{
+  float: right;
+  margin-top: 10%;
+  height: 30%;
+  width: 30%;
+  margin-right: 6%;
+}
 
 @keyframes App-logo-spin {
   from {
