@@ -16,29 +16,62 @@ function App() {
   const coresNotas = ['#FF0000','#FF7F00','#FFFF00','#00FF00','#0000FF','#2E2B5F','#8B00FF']
   const [nivel,setNivel] = useState(2);
   const [score,setScore] = useState(0);
+  const [seq, setSeq] = useState([] as any);
+  const [seqTocada, setSeqTocada] = useState([] as any);
+
   useEffect(()=>{
     if(score>0&&score%100==0){
       setNivel(nivel+1);
     }
   },[score])
 
+  useEffect(() => {
+    console.log(seq);
+  }, [seq])
+
+  useEffect(() => {
+    console.log(seqTocada);
+  }, [seqTocada])
+
+  useEffect(() => {
+     console.log(score);
+  }, [score])
+
+  useEffect(() => {
+    if(seq.length == seqTocada.length){
+      for(let i = 0; seq.length; i++){
+        if(seq[i] != seqTocada[i]) console.log("errou a sequencia")
+      }
+
+      setScore(score + 10);
+    }
+  }, [seq, seqTocada])
+
   return (
     <>
     <CircularMenu cutout={0.25} id="disco">
        {notasMusicais.slice(0,nivel+1).map((elem,index)=>
-          <button style={{backgroundColor:coresNotas[index]}} onClick={() => synth.triggerAttackRelease(`${elem}4`, "8n")}>
+          <button style={{backgroundColor:coresNotas[index]}} onClick={
+              () => {
+                synth.triggerAttackRelease(`${elem}4`, "8n")
+                setSeqTocada([...seqTocada, elem]);
+              }
+            }>
             <span>{elem}</span>
           </button>)
         }
      </CircularMenu>
      <button onClick={()=>setNivel(nivel+1)}>Aumentar Nível</button>
      <button onClick={()=>setNivel(nivel-1)}>Diminuir Nível</button>
-     <button onClick={() => tocarSequencia(notasMusicais.slice(0, nivel+1))}>Tocar Sequência</button>
+     <button onClick={() => {
+          setSeq(tocarSequencia(notasMusicais.slice(0, nivel+1)))
+        }
+      }>Tocar Sequência</button>
      </>
   );
 }
 
-function tocarSequencia(notas: Array<String>){
+function tocarSequencia(notas: any){
   let positions = notas.length;
   let seqNotas = [];
 
@@ -47,17 +80,24 @@ function tocarSequencia(notas: Array<String>){
     seqNotas.push(nota);
   }
 
-  console.log(seqNotas);
+  let index = 0;
 
   const synthPart = new Tone.Sequence(
     function(time, note) {
       synth.triggerAttackRelease(`${note}4`, 0.5);
-      console.log(note);
+
+      index++;
+
+      if(index == seqNotas.length) {
+        synthPart.stop();
+      }
     }, seqNotas, "2n"
   ) 
 
   Tone.Transport.start();
   synthPart.start();
+
+  return seqNotas;
 }
 
 export default App;
