@@ -8,6 +8,7 @@ import CircularMenu from "react-disc-menu";
 import { useState } from 'react';
 import * as Tone from 'tone'
 import { useEffect } from 'react';
+import { Sequence } from 'tone';
 const synth = new Tone.Synth().toDestination();
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
       setNivel(nivel+1);
     }
   },[score])
+
   return (
     <>
     <CircularMenu cutout={0.25} id="disco">
@@ -30,8 +32,32 @@ function App() {
         }
      </CircularMenu>
      <button onClick={()=>setNivel(nivel+1)}>Aumentar Nível</button>
+     <button onClick={()=>setNivel(nivel-1)}>Diminuir Nível</button>
+     <button onClick={() => tocarSequencia(notasMusicais.slice(0, nivel+1))}>Tocar Sequência</button>
      </>
   );
+}
+
+function tocarSequencia(notas: Array<String>){
+  let positions = notas.length;
+  let seqNotas = [];
+
+  for(let i = 0; i < positions; i++){
+    let nota = notas[Math.floor(Math.random() * positions)];
+    seqNotas.push(nota);
+  }
+
+  console.log(seqNotas);
+
+  const synthPart = new Tone.Sequence(
+    function(time, note) {
+      synth.triggerAttackRelease(`${note}4`, 0.5);
+      console.log(note);
+    }, seqNotas, "2n"
+  ) 
+
+  Tone.Transport.start();
+  synthPart.start();
 }
 
 export default App;
