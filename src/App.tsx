@@ -37,15 +37,7 @@ function App() {
      console.log(score);
   }, [score])
 
-  useEffect(() => {
-    if(seq.length == seqTocada.length){
-      for(let i = 0; seq.length; i++){
-        if(seq[i] != seqTocada[i]) console.log("errou a sequencia")
-      }
-
-      setScore(score + 10);
-    }
-  }, [seq, seqTocada])
+  
 
   return (
     <>
