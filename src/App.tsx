@@ -18,6 +18,7 @@ function App() {
   const [score,setScore] = useState(0);
   const [seq, setSeq] = useState([] as any);
   const [seqTocada, setSeqTocada] = useState([] as any);
+  const [points, setPoints] = useState(0);;
 
   useEffect(()=>{
     if(score>0&&score%100==0){
@@ -47,6 +48,10 @@ function App() {
     }
   }, [seq, seqTocada])
 
+  useEffect(() => {
+    console.log(points);
+  }, [points])
+
   return (
     <>
     <CircularMenu cutout={0.25} id="disco">
@@ -54,21 +59,33 @@ function App() {
           <button style={{backgroundColor:coresNotas[index]}} onClick={
               () => {
                 synth.triggerAttackRelease(`${elem}4`, "8n")
-                setSeqTocada([...seqTocada, elem]);
+                addNewNote(elem);
               }
             }>
             <span>{elem}</span>
           </button>)
         }
      </CircularMenu>
-     <button onClick={()=>setNivel(nivel+1)}>Aumentar Nível</button>
-     <button onClick={()=>setNivel(nivel-1)}>Diminuir Nível</button>
+     <button onClick={()=>setNivel(Math.min(6,nivel+1))}>Aumentar Nível</button>
+     <button onClick={()=>setNivel(Math.max(0, nivel-1))}>Diminuir Nível</button>
      <button onClick={() => {
           setSeq(tocarSequencia(notasMusicais.slice(0, nivel+1)))
         }
       }>Tocar Sequência</button>
+      <p>Pontos: {points}</p>
      </>
   );
+
+  function addNewNote(note: any) {
+    setSeqTocada([...seqTocada, note]);
+    if(seqTocada.length === nivel + 1) {
+      for(let i = 0; i < seqTocada.length; i++) {
+        if(seqTocada[i] !== seq[i])
+          return;
+      }
+      setPoints(points + 10);
+    }
+  }
 }
 
 function tocarSequencia(notas: any){
