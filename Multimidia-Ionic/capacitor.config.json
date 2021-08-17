@@ -1,0 +1,6 @@
+{
+	"appId": "io.ionic.starter",
+	"appName": "Multimidia",
+	"webDir": "build",
+	"bundledWebRuntime": false
+}

@@ -1,0 +1,55 @@
+@font-face {
+	font-family: 'Chocolate Bar';
+	src: url("../assets/chocolate-bar-demo/Chocolate\ Bar\ Demo.otf");
+}
+ion-content{
+
+    --ion-background-color:#333333;
+}
+#tela{
+    background: var(--ion-color-favorite);
+}
+
+.my-custom-class .alert-wrapper {
+    background: #e5e5e5;
+  }
+
+#div-bts{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+#div-bts>ion-button{
+    width: 96%;
+}
+
+#level{
+    width: 98%;
+    display: flex;
+    justify-content: space-between;
+}
+
+#level-bt{
+    width: 50%;
+}
+
+p{
+    text-align: center;
+    color: #ff7300;
+    font-family: 'Chocolate Bar';
+    font-size: 48px;
+    margin-bottom: 0%;
+    margin-top: 0%;
+}
+
+#disc-box{
+    display: flex;
+    justify-content: center;
+}
+
+#disco{
+    margin-top: 20%;
+    height: 60%;
+    width: 60%;
+}

@@ -1,0 +1,7 @@
+{
+  "name": "Multimidia",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react"
+}
