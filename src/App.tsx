@@ -15,33 +15,19 @@ function App() {
   const notasMusicais = ['A','B','C','D','E','F','G']
   const coresNotas = ['#FF0000','#FF7F00','#FFFF00','#00FF00','#0000FF','#2E2B5F','#8B00FF']
   const [nivel,setNivel] = useState(2);
-  const [score,setScore] = useState(0);
   const [seq, setSeq] = useState([] as any);
   const [seqTocada, setSeqTocada] = useState([] as any);
-  const [points, setPoints] = useState(0);;
-
-  useEffect(()=>{
-    if(score>0&&score%100==0){
-      setNivel(nivel+1);
-    }
-  },[score])
+  const [points, setPoints] = useState(0);
 
   useEffect(() => {
-    console.log(seq);
-  }, [seq])
-
-  useEffect(() => {
-    console.log(seqTocada);
+    addNewNote();
   }, [seqTocada])
 
   useEffect(() => {
-     console.log(score);
-  }, [score])
-
-  
-
-  useEffect(() => {
     console.log(points);
+    if((points > 0 && points % 30 == 0) && nivel < 6){
+      setNivel(nivel+1);
+    }
   }, [points])
 
   return (
@@ -50,8 +36,8 @@ function App() {
        {notasMusicais.slice(0,nivel+1).map((elem,index)=>
           <button style={{backgroundColor:coresNotas[index]}} onClick={
               () => {
-                synth.triggerAttackRelease(`${elem}4`, "8n")
-                addNewNote(elem);
+                synth.triggerAttackRelease(`${elem}4`, "2n")
+                setSeqTocada([...seqTocada, elem]);
               }
             }>
             <span>{elem}</span>
@@ -68,45 +54,59 @@ function App() {
      </>
   );
 
-  function addNewNote(note: any) {
-    setSeqTocada([...seqTocada, note]);
-    if(seqTocada.length === nivel + 1) {
-      for(let i = 0; i < seqTocada.length; i++) {
-        if(seqTocada[i] !== seq[i])
-          return;
+  function addNewNote() {
+    if(seqTocada.length === seq.length && seqTocada.length != 0){
+      for(let i = 0; i < seqTocada.length; i++){
+        if(seq[i] != seqTocada[i]){
+          setSeqTocada([])
+          return false;
+        }
       }
-      setPoints(points + 10);
+
+      setPoints(points + 10)
+      setSeqTocada([])
+
+      return true;
     }
-  }
-}
+  } 
 
-function tocarSequencia(notas: any){
-  let positions = notas.length;
-  let seqNotas = [];
+  function tocarSequencia(notas: any){
+    let positions = notas.length;
+    let seqNotas = [...seq];
 
-  for(let i = 0; i < positions; i++){
-    let nota = notas[Math.floor(Math.random() * positions)];
-    seqNotas.push(nota);
-  }
-
-  let index = 0;
-
-  const synthPart = new Tone.Sequence(
-    function(time, note) {
-      synth.triggerAttackRelease(`${note}4`, 0.5);
-
-      index++;
-
-      if(index == seqNotas.length) {
-        synthPart.stop();
+    let nota;
+  
+    if(seqNotas.length !== 0){
+      nota = notas[Math.floor(Math.random() * positions)];
+      seqNotas.push(nota);
+    } else {
+      for(let i = 0; i < positions; i++){
+        nota = notas[Math.floor(Math.random() * positions)];
+        seqNotas.push(nota);
       }
-    }, seqNotas, "2n"
-  ) 
-
-  Tone.Transport.start();
-  synthPart.start();
-
-  return seqNotas;
+    }
+  
+    let index = 0;
+  
+    const synthPart = new Tone.Sequence(
+      function(time, note) {
+        synth.triggerAttackRelease(`${note}4`, 0.5);
+  
+        index++;
+  
+        if(index == seqNotas.length) {
+          synthPart.stop();
+        }
+      }, seqNotas, "2n"
+    ) 
+  
+    Tone.Transport.start();
+    synthPart.start();
+  
+    return seqNotas;
+  }
 }
+
+
 
 export default App;
