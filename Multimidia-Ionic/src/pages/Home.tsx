@@ -12,21 +12,31 @@ import './Home.css';
 const synth = new Tone.Synth().toDestination();
 
 const Home: React.FC = () => {
-  const notasMusicais = ['A', 'B', 'C', 'D', 'E', 'F', 'G']
+  const [nivel, setNivel] = useState(1);
+  const notasMusicais = ['C', 'D', 'F', 'E', 'G', 'A', 'B']
   const coresNotas = ['#FF0000', '#FF7F00', '#FFFF00', '#00FF00', '#0000FF', '#2E2B5F', '#8B00FF']
-  const [nivel, setNivel] = useState(2);
+  const songsNotes = ['C', 'C', 'D', 'C', 'F', 'E', 'C', 'C', 'D', 'C', 'G', 'F', 'A']
+  const [notesSet, setNotesSet] = useState(new Set());
+  const [newNote, setNewNote] = useState(false);
+  // let [ax, setAx] = useState(2);
   const [seq, setSeq] = useState([] as any);
   const [seqTocada, setSeqTocada] = useState([] as any);
   const [points, setPoints] = useState(0);
   const [present] = useIonAlert();
-  
+  // if(songsNotes.length>seqTocada.length && !notasMusicais.slice(0,nivel).find(el=>el==songsNotes[seqTocada.length])){
+  //    setNivel(nivel+1)
+  //}
   useEffect(() => {
     addNewNote();
   }, [seqTocada])
 
+  function setLevel() {
+    if (nivel + 1< notesSet.size)
+      setNivel(nivel + 1);
+  }
+
   useEffect(() => {
-    console.log(points);
-    if ((points > 0 && points % 30 == 0) && nivel < 6) {
+    if (((points > 0 && points % 30 == 0)) && nivel < 6) {
       setNivel(nivel + 1);
     }
   }, [points])
@@ -65,17 +75,26 @@ const Home: React.FC = () => {
     let nota;
 
     if (seqNotas.length !== 0) {
-      nota = notas[Math.floor(Math.random() * positions)];
+      nota = seqNotas.length > songsNotes.length ? notas[Math.floor(Math.random() * positions)] : songsNotes[seqNotas.length];
       seqNotas.push(nota);
+      notesSet.add(nota)
     } else {
       for (let i = 0; i < positions; i++) {
-        nota = notas[Math.floor(Math.random() * positions)];
+        nota = seqNotas.length > songsNotes.length ? notas[Math.floor(Math.random() * positions)] : songsNotes[seqNotas.length];
         seqNotas.push(nota);
+        notesSet.add(nota)
       }
     }
-
-    console.log(seqNotas)
-
+    setNewNote(false);
+    let ax = 0;
+    for (let i = 0; i < seqNotas.length; i++) {
+      notesSet.add(seqNotas[i]);
+    }
+    console.log(seqNotas);
+    if (notesSet.size > ax) {
+      setNewNote(true);
+    }
+    setLevel();
     let index = 0;
 
     const synthPart = new Tone.Sequence(
@@ -120,7 +139,7 @@ const Home: React.FC = () => {
               }
             </CircularMenu>
           </div>
-          <div style={{ bottom: 6,position:'fixed', width:'100%' }}  id="tela">
+          <div style={{ bottom: 6, position: 'fixed', width: '100%' }} id="tela">
             <div id="div-bts">
               <IonButton onClick={() => {
                 setSeq(tocarSequencia(notasMusicais.slice(0, nivel + 1)))
@@ -134,7 +153,10 @@ const Home: React.FC = () => {
                 <IonButton id='level-bt' onClick={() => setNivel(Math.min(6, nivel + 1))}>
                   <IonIcon slot="icon-only" icon={arrowUpOutline} />
                 </IonButton>
-                <IonButton id='level-bt' onClick={() => setNivel(Math.max(0, nivel - 1))}>
+                <IonButton id='level-bt' onClick={() => {
+                  if (nivel >= 2) setNivel(Math.max(0, nivel - 1))
+                }
+                }>
                   <IonIcon slot="icon-only" icon={arrowDownOutline} />
                 </IonButton>
               </div>
